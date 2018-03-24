@@ -10,6 +10,30 @@
  */
 
  // main function controlls program
+ var last;
+ var time = 0;
+ var counter = 0;
+
+ var minutesLabel = document.getElementById("minutes");
+ var secondsLabel = document.getElementById("seconds");
+ var totalSeconds = 0;
+ setInterval(setTime, 1000);
+
+ function setTime() {
+   ++totalSeconds;
+   secondsLabel.innerHTML = pad(totalSeconds % 60);
+   minutesLabel.innerHTML = pad(parseInt(totalSeconds / 60));
+ }
+
+ function pad(val) {
+   var valString = val + "";
+   if (valString.length < 2) {
+     return "0" + valString;
+   } else {
+     return valString;
+   }
+ }
+
 function main(){
   // get dom tags
   var deck = document.querySelector('.deck');
@@ -36,6 +60,7 @@ function buildGame(cards, dom, deck, moves){
   var set = [];
   // hold moves counter
   moves.textContent = 0;
+  counter = 0;
   //add stars
   starsDom[0].firstElementChild.classList.remove('fa-star-o');
   starsDom[1].firstElementChild.classList.remove('fa-star-o');
@@ -44,6 +69,7 @@ function buildGame(cards, dom, deck, moves){
   removeCards(dom);
   //add new shuffled cards
   addCards(shuffle(cards), deck, set, moves);
+  totalSeconds = 0;
 }
 
 //add cards
@@ -76,17 +102,39 @@ function resetGame(cards, dom, deck, build, moves){
 
 // flip card
 function flipCard(card, set, moves){
-    //add classes to show cardsDom
-    card.classList.add("open");
-    card.classList.add("show");
-    //push card to array to pair
-    set.push(card);
-    //check if 2 el in array
-    if(set.length == 2){
-      //if 2 el check matches and add a move
-      checkMatch(set, moves);
-      countMoves(moves, countStars);
+  var id = card.getAttribute('id');
+  if(!(time == 1)){
+    if(last == undefined){
+        console.log(last)
+      last = id;
+      card.classList.add("open");
+      card.classList.add("show");
+      //push card to array to pair
+      set.push(card);
+      //check if 2 el in array
+      if(set.length == 2){
+        //if 2 el check matches and add a move
+        checkMatch(set, moves);
+        countMoves(moves, countStars);
+      }
+    }else if(!(last == id)){
+      //add classes to show cardsDom
+        console.log(last)
+      last = undefined;
+      card.classList.add("open");
+      card.classList.add("show");
+      //push card to array to pair
+      set.push(card);
+      //check if 2 el in array
+      if(set.length == 2){
+        //if 2 el check matches and add a move
+        checkMatch(set, moves);
+        countMoves(moves, countStars);
+      }
     }
+
+  }
+
 }
 
 // check if cards in array match
@@ -102,9 +150,11 @@ function checkMatch(set, moves){
     set[0].classList.add("error");
     set[1].classList.add("error");
     // allow card to be red for set amount of time
+    time = 1;
     setTimeout(function(){
       notMatch(set)
       set.length = 0;
+      time = 0;
     }, 1000);
   }
 }
@@ -144,20 +194,14 @@ function notMatch(arr){
 
 // count users moves
 function countMoves(moves, countStars){
-    if( typeof countMoves.counter == 'undefined' ) {
-        countMoves.counter = 0;
-    }
-    countMoves.counter++;
-    moves.textContent = countMoves.counter;
-    countStars(countMoves.counter);
+    counter++;
+    moves.textContent = counter;
+    countStars(counter);
 }
 // determine user score by modifying stars
 function countStars(moves){
   var starsDom = document.getElementsByClassName('star');
   switch(moves){
-    case 15:
-      starsDom[0].firstElementChild.classList.add('fa-star-o');
-      break;
     case 10:
       starsDom[1].firstElementChild.classList.add('fa-star-o');
       break;
@@ -182,7 +226,7 @@ function hasWon(moves){
   var modal = document.getElementById('myModal');
   var span = document.getElementsByClassName("close")[0];
   var p = document.createElement("p");
-  p.textContent = `You Have Won!\n Current Score Is ${stars} Stars\n Game Completed In ${moves} Moves\n.`;
+  p.textContent = `You Have Won!\n Current Score Is ${stars} Stars\n Game Completed In ${moves} Moves\n. Time Taken: ${Math.floor(totalSeconds / 60)}:${(totalSeconds % 60)}`;
   modal.firstElementChild.appendChild(p);
   // open the modal
     modal.style.display = "block";
@@ -192,14 +236,13 @@ function hasWon(moves){
       modal.style.display = "none";
   }
 
-  // close model on outside clicks
+  // close model on outside
   window.onclick = function(event) {
       if (event.target == modal) {
           modal.style.display = "none";
       }
   }
 }
-
 
 
 
