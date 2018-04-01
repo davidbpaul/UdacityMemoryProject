@@ -40,12 +40,19 @@ function main(){
   var cardsDom = document.getElementsByClassName('card');
   var cards = Array.from(cardsDom)
   var restart = document.querySelector('.restart');
+  var re = document.querySelector('.re');
   var moves = document.querySelector('.moves');
+  var modal = document.getElementById('myModal');
   //build game
   buildGame(cards, cardsDom, deck, moves);
 
   //restart game on icon click
   restart.addEventListener('click',function() {
+    resetGame(cards, cardsDom, deck, buildGame, moves);
+  });
+
+  re.addEventListener('click',function() {
+    modal.style.display = "none";
     resetGame(cards, cardsDom, deck, buildGame, moves);
   });
 }
@@ -228,10 +235,13 @@ function hasWon(moves){
   var p = document.createElement("p");
   p.textContent = `You Have Won!\n Current Score Is ${stars} Stars\n Game Completed In ${moves} Moves\n. Time Taken: ${Math.floor(totalSeconds / 60)}:${(totalSeconds % 60)}`;
   modal.firstElementChild.appendChild(p);
+
+
   // open the modal
     modal.style.display = "block";
 
   // When the user clicks on x close the modal
+
   span.onclick = function() {
       modal.style.display = "none";
       main();
