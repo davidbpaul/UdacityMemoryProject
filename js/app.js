@@ -234,12 +234,14 @@ function hasWon(moves){
   // When the user clicks on x close the modal
   span.onclick = function() {
       modal.style.display = "none";
+      main();
   }
 
   // close model on outside
   window.onclick = function(event) {
       if (event.target == modal) {
           modal.style.display = "none";
+          main();
       }
   }
 }
